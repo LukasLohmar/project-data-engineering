@@ -4,17 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataSystem.Database;
 
-public class ApplicationContext : DbContext
+public class ApplicationContext(string connectionString) : DbContext
 {
     public DbSet<SensorData> SensorData { get; set; }
 
-    public ApplicationContext()
-    {
-        
-    }
-    
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseNpgsql($"");
+    private string ConnectionString { get; set; } = connectionString;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseNpgsql(ConnectionString);
 }
 
 public class SensorData
