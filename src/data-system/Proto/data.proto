@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+
+// set namespace for generated assets
+option csharp_namespace = "DataSystem.Grpc";
+
+// main service with callable functions
+service DataService {
+  rpc Save (SaveRequest) returns (BasicReply);
+}
+
+message SaveRequest {
+  // publicly faced endpoints needs authorization
+  string AuthorizationKey = 1;
+
+  string TimeStamp = 5;
+  string DeviceId = 6;
+  
+  // leave space for new fields between content fields and identifying fields
+  google.protobuf.DoubleValue CarbonDioxide = 20;
+  google.protobuf.DoubleValue Humidity = 21;
+  google.protobuf.BoolValue Light = 22;
+  google.protobuf.DoubleValue Lpg = 23;
+  google.protobuf.BoolValue Motion = 24;
+  google.protobuf.DoubleValue Smoke = 25;
+  google.protobuf.DoubleValue Temperature = 26;
+  // leave space
+  google.protobuf.StringValue AdditionalData = 50;
+}
+
+message BasicReply {
+  enum ResponseValue {
+    RESPONSE_OK = 0;
+    RESPONSE_UNAUTHORIZED = 1;
+    RESPONSE_INTERNAL_SERVER_ERROR = 2;
+  }
+
+  ResponseValue ResponseState = 1;
+  string ResponseMessage = 2;
+}
