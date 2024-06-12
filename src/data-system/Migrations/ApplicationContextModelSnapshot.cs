@@ -23,6 +23,31 @@ namespace DataSystem.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("DataSystem.Database.Authorization", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("Locked")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("Token")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("Authorization");
+                });
+
             modelBuilder.Entity("DataSystem.Database.SensorData", b =>
                 {
                     b.Property<int>("Id")
@@ -53,6 +78,9 @@ namespace DataSystem.Migrations
                     b.Property<bool?>("Motion")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("ProviderTokenId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal?>("Smoke")
                         .HasColumnType("numeric");
 
@@ -64,7 +92,18 @@ namespace DataSystem.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProviderTokenId");
+
                     b.ToTable("SensorData");
+                });
+
+            modelBuilder.Entity("DataSystem.Database.SensorData", b =>
+                {
+                    b.HasOne("DataSystem.Database.Authorization", "ProviderToken")
+                        .WithMany()
+                        .HasForeignKey("ProviderTokenId");
+
+                    b.Navigation("ProviderToken");
                 });
 #pragma warning restore 612, 618
         }
