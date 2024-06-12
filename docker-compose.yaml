@@ -1,0 +1,33 @@
+
+services:
+  data-system:
+    # here should be the newly created image
+    # image: docker.io/library/data-system
+    build:
+      context: ./src/data-system/
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    container_name: data-system-service
+    ports:
+      - "6500:8080"
+    restart: always
+    environment:
+      - SQL_SERVER=User ID=postgres;Password=postgres;Server=db;Port=5432;Database=data-system-db; Integrated Security=true;Pooling=true;
+    links:
+      - db
+  db:  
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=data-system-db
+    ports:
+      - "6501:5432"
+    restart: always
+    volumes:
+      - app_data:/var/lib/postgresql/data
+
+volumes:
+  app_data:
