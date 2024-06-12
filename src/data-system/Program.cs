@@ -1,22 +1,24 @@
 ﻿using DataSystem.Database;
 using DataSystem.Service;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Additional configuration is required to successfully run gRPC on macOS.
-// For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
-
-// Add services to the container.
-builder.Services.AddDbContextFactory<ApplicationContext>();
+// add grpc service and database service to application
+builder.Services.AddDbContextFactory<ApplicationContext>(options => {
+    options.UseNpgsql(Environment.GetEnvironmentVariable("SQL_SERVER"));
+});
 builder.Services.AddGrpc();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// map grpc service
 app.MapGrpcService<DataService>();
 
+// map get requests
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 app.Run();

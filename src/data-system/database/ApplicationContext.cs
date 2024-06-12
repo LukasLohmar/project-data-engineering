@@ -4,13 +4,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataSystem.Database;
 
-public class ApplicationContext(string connectionString) : DbContext
+public class ApplicationContext : DbContext
 {
     public DbSet<SensorData> SensorData { get; set; }
+    public DbSet<Authorization> Authorization { get; set; }
 
-    private string ConnectionString { get; set; } = connectionString;
+    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) {
+        
+    }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseNpgsql(ConnectionString);
+    private string ConnectionString { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Authorization>()
+            .HasIndex(p => new { p.Token })
+            .IsUnique(true);
+    }
 }
 
 public class SensorData
@@ -37,4 +47,17 @@ public class SensorData
     // for NOSQL-like data
     [Column(TypeName = "jsonb")]
     public string? AdditionalData { get; set; }
+
+    public Authorization? ProviderToken { get; set; }
+}
+
+public class Authorization {
+    public int Id { get; set; }
+    
+    [Column(TypeName = "uuid")]
+    public Guid Token { get; set; }
+    [Column(TypeName = "boolean")]
+    public bool Locked { get; set; }
+    [Column(TypeName = "timestamp without time zone")]
+    public DateTime CreatedAt { get; set; }
 }

@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataSystem.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240612001355_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20240612025135_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,31 @@ namespace DataSystem.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("DataSystem.Database.Authorization", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("Locked")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("Token")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("Authorization");
+                });
 
             modelBuilder.Entity("DataSystem.Database.SensorData", b =>
                 {
@@ -56,6 +81,9 @@ namespace DataSystem.Migrations
                     b.Property<bool?>("Motion")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("ProviderTokenId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal?>("Smoke")
                         .HasColumnType("numeric");
 
@@ -67,7 +95,18 @@ namespace DataSystem.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProviderTokenId");
+
                     b.ToTable("SensorData");
+                });
+
+            modelBuilder.Entity("DataSystem.Database.SensorData", b =>
+                {
+                    b.HasOne("DataSystem.Database.Authorization", "ProviderToken")
+                        .WithMany()
+                        .HasForeignKey("ProviderTokenId");
+
+                    b.Navigation("ProviderToken");
                 });
 #pragma warning restore 612, 618
         }

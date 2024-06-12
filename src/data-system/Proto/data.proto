@@ -12,7 +12,7 @@ service DataService {
 
 message SaveRequest {
   // publicly faced endpoints needs authorization
-  string AuthorizationKey = 1;
+  string AuthorizationToken = 1;
 
   string TimeStamp = 5;
   string DeviceId = 6;

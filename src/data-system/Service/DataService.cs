@@ -9,7 +9,7 @@ public class DataService : Grpc.DataService.DataServiceBase
     public override Task<BasicReply> Save(SaveRequest request, ServerCallContext context)
     {
         // check for timestamp
-        if (request.AuthorizationKey?.Equals(string.Empty) == null)
+        if (request.AuthorizationToken?.Equals(string.Empty) == null)
             return Task.FromResult(CreateResult(BasicReply.Types.ResponseValue.ResponseUnauthorized));
         
         // check for device id -> dont save if mac is not provided
