@@ -25,20 +25,20 @@ public class SensorData
     [Column(TypeName = "macaddr")]
     public PhysicalAddress DeviceId { get; set; }
     [Column(TypeName = "numeric")]
-    public decimal CarbonDioxide { get; set; }
+    public decimal? CarbonDioxide { get; set; }
     [Column(TypeName = "numeric")]
-    public decimal Humidity { get; set; }
+    public decimal? Humidity { get; set; }
     [Column(TypeName = "boolean")]
-    public bool Light { get; set; }
+    public bool? Light { get; set; }
     [Column(TypeName = "numeric")]
-    public decimal Lpg { get; set; }
+    public decimal? Lpg { get; set; }
     [Column(TypeName = "boolean")]
-    public bool Motion { get; set; }
+    public bool? Motion { get; set; }
     [Column(TypeName = "numeric")]
-    public decimal Smoke { get; set; }
+    public decimal? Smoke { get; set; }
     [Column(TypeName = "numeric")]
-    public decimal Temperature { get; set; }
+    public decimal? Temperature { get; set; }
     // for NOSQL-like data
     [Column(TypeName = "jsonb")]
-    public string AdditionalData { get; set; }
+    public string? AdditionalData { get; set; }
 }

@@ -21,14 +21,14 @@ namespace DataSystem.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TimeStamp = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     DeviceId = table.Column<PhysicalAddress>(type: "macaddr", nullable: false),
-                    CarbonDioxide = table.Column<decimal>(type: "numeric", nullable: false),
-                    Humidity = table.Column<decimal>(type: "numeric", nullable: false),
-                    Light = table.Column<bool>(type: "boolean", nullable: false),
-                    Lpg = table.Column<decimal>(type: "numeric", nullable: false),
-                    Motion = table.Column<bool>(type: "boolean", nullable: false),
-                    Smoke = table.Column<decimal>(type: "numeric", nullable: false),
-                    Temperature = table.Column<decimal>(type: "numeric", nullable: false),
-                    AdditionalData = table.Column<string>(type: "jsonb", nullable: false)
+                    CarbonDioxide = table.Column<decimal>(type: "numeric", nullable: true),
+                    Humidity = table.Column<decimal>(type: "numeric", nullable: true),
+                    Light = table.Column<bool>(type: "boolean", nullable: true),
+                    Lpg = table.Column<decimal>(type: "numeric", nullable: true),
+                    Motion = table.Column<bool>(type: "boolean", nullable: true),
+                    Smoke = table.Column<decimal>(type: "numeric", nullable: true),
+                    Temperature = table.Column<decimal>(type: "numeric", nullable: true),
+                    AdditionalData = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {

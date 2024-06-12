@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataSystem.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240611121954_InitialMigration")]
+    [Migration("20240612001355_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -35,32 +35,31 @@ namespace DataSystem.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AdditionalData")
-                        .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<decimal>("CarbonDioxide")
+                    b.Property<decimal?>("CarbonDioxide")
                         .HasColumnType("numeric");
 
                     b.Property<PhysicalAddress>("DeviceId")
                         .IsRequired()
                         .HasColumnType("macaddr");
 
-                    b.Property<decimal>("Humidity")
+                    b.Property<decimal?>("Humidity")
                         .HasColumnType("numeric");
 
-                    b.Property<bool>("Light")
+                    b.Property<bool?>("Light")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal>("Lpg")
+                    b.Property<decimal?>("Lpg")
                         .HasColumnType("numeric");
 
-                    b.Property<bool>("Motion")
+                    b.Property<bool?>("Motion")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal>("Smoke")
+                    b.Property<decimal?>("Smoke")
                         .HasColumnType("numeric");
 
-                    b.Property<decimal>("Temperature")
+                    b.Property<decimal?>("Temperature")
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("TimeStamp")
