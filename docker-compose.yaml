@@ -28,6 +28,7 @@ services:
     restart: always
     volumes:
       - app_data:/var/lib/postgresql/data
+      - ./src/dataset/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   app_data:
