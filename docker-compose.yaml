@@ -1,23 +1,37 @@
-
 services:
   data-system:
-    # here should be the newly created image
-    # image: docker.io/library/data-system
     build:
       context: ./src/data-system/
       dockerfile: Dockerfile
     depends_on:
-      - db
-    container_name: data-system-service
+      db:
+        condition: service_healthy
+    container_name: data-system
     ports:
       - "6500:8080"
     restart: always
     environment:
-      - SQL_SERVER=User ID=postgres;Password=postgres;Server=db;Port=5432;Database=data-system-db; Integrated Security=true;Pooling=true;
+      - SQL_SERVER=User ID=postgres;Password=postgres;Server=db;Port=5432;Database=data-system-db;Pooling=true;
+    links:
+      - db
+  import:
+    build:
+      context: ./src/dataset/initialImport/
+      dockerfile: Dockerfile
+    container_name: python-import
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=data-system-db
+    depends_on:
+      - data-system
+    restart: no
     links:
       - db
   db:  
-    image: postgres:latest
+    image: postgres:16.3-alpine3.20
     container_name: postgres
     environment:
       - POSTGRES_USER=postgres
@@ -26,9 +40,14 @@ services:
     ports:
       - "6501:5432"
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
     volumes:
-      - app_data:/var/lib/postgresql/data
+      - data:/var/lib/postgresql/data
       - ./src/dataset/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
-  app_data:
+  data:

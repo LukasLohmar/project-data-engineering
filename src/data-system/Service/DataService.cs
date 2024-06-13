@@ -3,9 +3,17 @@ using Grpc.Core;
 
 namespace DataSystem.Service;
 
+/// <summary>
+/// gRPC-Controller
+/// </summary>
 public class DataService : Grpc.DataService.DataServiceBase
 {
-    // rpc entrypoint where data will be collected
+    /// <summary>
+    /// save sensor-data to the data-system
+    /// </summary>
+    /// <param name="request">the request data</param>
+    /// <param name="context">server-side call context. clients wont need to provide this parameter</param>
+    /// <returns>return BasicReply which consists of a ResponseState and a message when the call fails</returns>
     public override Task<BasicReply> Save(SaveRequest request, ServerCallContext context)
     {
         // check for timestamp
@@ -19,9 +27,6 @@ public class DataService : Grpc.DataService.DataServiceBase
         // check for timestamp
         if (request.TimeStamp?.Equals(string.Empty) == null)
             return Task.FromResult(CreateResult(BasicReply.Types.ResponseValue.ResponseInternalServerError, "no timestamp was provided"));
-
-
-
 
 
         return Task.FromResult(CreateResult(BasicReply.Types.ResponseValue.ResponseOk));
