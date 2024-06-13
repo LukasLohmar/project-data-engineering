@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,6 +21,7 @@ namespace DataSystem.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Token = table.Column<Guid>(type: "uuid", nullable: false),
                     Locked = table.Column<bool>(type: "boolean", nullable: false),
+                    AuthorizedFlags = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
                 constraints: table =>

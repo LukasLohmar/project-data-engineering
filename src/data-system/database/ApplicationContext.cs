@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Net.NetworkInformation;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 
 namespace DataSystem.Database;
 
@@ -12,8 +13,6 @@ public class ApplicationContext : DbContext
     public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) {
         
     }
-
-    private string ConnectionString { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,8 +55,18 @@ public class Authorization {
     
     [Column(TypeName = "uuid")]
     public Guid Token { get; set; }
+
     [Column(TypeName = "boolean")]
-    public bool Locked { get; set; }
+    public bool Locked { get; set; } = true;
+    public AuthorizeFlags AuthorizedFlags { get; set; }
     [Column(TypeName = "timestamp without time zone")]
     public DateTime CreatedAt { get; set; }
+}
+
+[Flags]
+public enum AuthorizeFlags {
+    None = 1,
+    Read = 2,
+    Write = 4,
+    Delete = 8
 }
