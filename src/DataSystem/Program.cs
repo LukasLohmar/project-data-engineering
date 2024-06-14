@@ -12,11 +12,12 @@ builder.Services.AddDbContextFactory<ApplicationContext>(options =>
 {
     options.UseNpgsql(Environment.GetEnvironmentVariable("SQL_SERVER"));
 });
-builder.Services.AddGrpc();
+builder.Services.AddGrpc().AddJsonTranscoding();
 builder.Services.AddControllers();
 
 // add services for swagger documentation generation
 builder.Services.AddMvc();
+builder.Services.AddGrpcSwagger();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "API-Documentation", Version = "v1" });
@@ -24,17 +25,17 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// swagger
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("v1/swagger.json", "API V1");
+});
+
 // map grpc service
 app.MapGrpcService<DataService>();
 
-// map get requests
+// map controller
 app.MapControllers();
-app.MapGet("/",
-    () =>
-        "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
-
-// swagger
-app.UseSwagger();
-app.UseSwaggerUI(c => { c.SwaggerEndpoint("v1/swagger.json", "API V1"); });
 
 app.Run();
