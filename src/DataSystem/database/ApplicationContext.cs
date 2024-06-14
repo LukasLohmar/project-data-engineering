@@ -20,12 +20,14 @@ public class ApplicationContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // create index and guarantee uniqueness on UUID field
         modelBuilder.Entity<Authorization>()
             .HasIndex(p => new { p.Token })
             .IsUnique();
     }
 }
 
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 public class SensorData
 {
     public int Id { get; set; }
@@ -33,7 +35,7 @@ public class SensorData
     [Column(TypeName = "timestamp without time zone")]
     public DateTime TimeStamp { get; set; }
 
-    [Column(TypeName = "macaddr")] public PhysicalAddress DeviceId { get; set; }
+    [Column(TypeName = "macaddr")] public PhysicalAddress DeviceId { get; set; } = null!;
 
     [Column(TypeName = "numeric")] public decimal? CarbonDioxide { get; set; }
 
@@ -67,6 +69,18 @@ public class Authorization
 
     [Column(TypeName = "timestamp without time zone")]
     public DateTime CreatedAt { get; set; }
+
+    public static async Task<Authorization?> CheckForAuthorizationFlags(ApplicationContext context, string token,
+        AuthorizeFlags flags, bool lockState)
+    {
+        // check for token
+        if (string.IsNullOrEmpty(token) ||
+            !Guid.TryParse(token.AsSpan(), out var guid))
+            return null;
+
+        return await context.Authorization.FirstOrDefaultAsync(i =>
+            i.Token == guid && i.Locked == lockState && i.AuthorizedFlags.HasFlag(flags));
+    }
 }
 
 [Flags]

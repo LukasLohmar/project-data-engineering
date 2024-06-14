@@ -2,6 +2,8 @@ namespace DataSystem.Database.Dto;
 
 public class SensorDataDto(SensorData result)
 {
+    public int Id { get; set; } = result.Id;
+
     public DateTime TimeStamp { get; set; } = result.TimeStamp;
     public string? DeviceId { get; set; } = result.DeviceId.ToString();
 
