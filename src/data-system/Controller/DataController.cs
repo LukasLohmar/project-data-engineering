@@ -30,19 +30,17 @@ public class DataController(ApplicationContext context) : ControllerBase {
     public async Task<ActionResult<List<SensorDataDto>>> GetLatestData(string accessToken, string? deviceId = null, int count = 100)
     {
         // check if token is set and valid
-        if (string.IsNullOrEmpty(accessToken))
+        if (string.IsNullOrEmpty(accessToken) || !Guid.TryParse(accessToken.AsSpan(), out var guid))
             return BadRequest();
         
-        // generate guid from token
-        var guid = Guid.Parse(accessToken.AsSpan());
-        var authorizationEntry = await _context.Authorization.Where(i => i.Token == guid && i.AuthorizedFlags.HasFlag(AuthorizeFlags.Read) && i.Locked == false).FirstOrDefaultAsync();
+        var authorizationEntry = await context.Authorization.Where(i => i.Token == guid && i.Locked == false && i.AuthorizedFlags.HasFlag(AuthorizeFlags.Read)).FirstOrDefaultAsync();
 
         // return if token is not allowed or locked
         if (authorizationEntry == null)
             return BadRequest();
         
         // get generic queryable when deviceId is not set
-        var queryable = deviceId != null ? _context.SensorData.Where(i => i.DeviceId == PhysicalAddress.Parse(deviceId)) : _context.SensorData.AsQueryable();
+        var queryable = deviceId != null && PhysicalAddress.TryParse(deviceId, out var parsedDeviceId) ? context.SensorData.Where(i => i.DeviceId == parsedDeviceId) : context.SensorData.AsQueryable();
 
         var result = queryable.OrderByDescending(i => i.TimeStamp).Take(count).Select(i => new SensorDataDto(i));
 

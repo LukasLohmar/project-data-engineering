@@ -7,10 +7,14 @@ namespace DataSystem.Database;
 
 public class ApplicationContext : DbContext
 {
-    public DbSet<SensorData> SensorData { get; set; }
-    public DbSet<Authorization> Authorization { get; set; }
+    public virtual DbSet<SensorData> SensorData { get; set; } = null!;
+    public virtual DbSet<Authorization> Authorization { get; set; } = null!;
 
-    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) {
+    // needed for testing
+    public ApplicationContext() { }
+    
+    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
+    {
         
     }
 
