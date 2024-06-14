@@ -2,7 +2,6 @@ using System.Net.NetworkInformation;
 using DataSystem.Database;
 using DataSystem.Grpc;
 using Grpc.Core;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataSystem.Service;
 
@@ -29,7 +28,9 @@ public class DataService : Grpc.DataService.DataServiceBase
     public override async Task<BasicReply> Save(SaveRequest request, ServerCallContext serverContext)
     {
         // check if token exist and allows for writing data
-        var authorizationEntry = await Authorization.CheckForAuthorizationFlags(context, request.AuthorizationToken, AuthorizeFlags.Write, false);
+        var authorizationEntry =
+            await Authorization.CheckForAuthorizationFlags(context, request.AuthorizationToken, AuthorizeFlags.Write,
+                false);
 
         if (authorizationEntry == null)
             return await Task.FromResult(CreateResult(BasicReply.Types.ResponseValue.ResponseUnauthorized));

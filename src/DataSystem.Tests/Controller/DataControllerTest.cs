@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
-using System.Threading;
 using System.Threading.Tasks;
 using DataSystem.Controller;
 using DataSystem.Database;
 using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MockQueryable.Moq;
 using Moq;
@@ -20,11 +18,11 @@ public class DataControllerTest
 {
     private static readonly Mock<ApplicationContext> Context = new();
     private static DataController DataController;
-    
+
     [ClassInitialize]
     public static async Task ClassInitialize(TestContext testContext)
     {
-        var authorization = new Authorization()
+        var authorization = new Authorization
         {
             Id = 1,
             Locked = true,
@@ -32,11 +30,11 @@ public class DataControllerTest
             AuthorizedFlags = AuthorizeFlags.Write,
             CreatedAt = DateTime.Now
         };
-        
+
         // setup SensorData context
         var mockSensorDataSet = new List<SensorData>
         {
-            new ()
+            new()
             {
                 Id = 1,
                 TimeStamp = DateTime.Now,
@@ -44,7 +42,7 @@ public class DataControllerTest
                 Temperature = 30.1m,
                 ProviderToken = authorization
             },
-            new ()
+            new()
             {
                 Id = 2,
                 TimeStamp = DateTime.Now.AddHours(2),
@@ -52,7 +50,7 @@ public class DataControllerTest
                 Temperature = 30.3m,
                 ProviderToken = authorization
             },
-            new ()
+            new()
             {
                 Id = 3,
                 TimeStamp = DateTime.Now,
@@ -60,7 +58,7 @@ public class DataControllerTest
                 Temperature = 33.5m,
                 ProviderToken = authorization
             },
-            new ()
+            new()
             {
                 Id = 3,
                 TimeStamp = DateTime.Now.AddHours(2),
@@ -86,11 +84,11 @@ public class DataControllerTest
 
         Context.Setup(m => m.SensorData).Returns(mockSensorDataSet.Object);
         Context.Setup(m => m.Authorization).Returns(mockAuthorizationSet.Object);
-        
+
         // create new DataController
         DataController = new DataController(Context.Object);
     }
-    
+
     [TestMethod]
     [DataRow("11111111-1111-1111-1111-111111111112", 4, null, null)]
     [DataRow("11111111-1111-1111-1111-111111111112", 2, "A9612CF6BB19", null)]
