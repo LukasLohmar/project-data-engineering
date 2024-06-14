@@ -11,7 +11,7 @@ namespace DataSystem.Controller;
 /// <summary>
 ///     API-Controller
 /// </summary>
-[Route("api/data")]
+[Route("v1/data")]
 [ApiController]
 public class DataController : ControllerBase
 {
