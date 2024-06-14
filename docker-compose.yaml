@@ -1,22 +1,7 @@
 services:
-  data-system:
-    build:
-      context: ./src/data-system/
-      dockerfile: Dockerfile
-    depends_on:
-      db:
-        condition: service_healthy
-    container_name: data-system
-    ports:
-      - "6500:8080"
-    restart: always
-    environment:
-      - SQL_SERVER=User ID=postgres;Password=postgres;Server=db;Port=5432;Database=data-system-db;Pooling=true;
-    links:
-      - db
   import:
     build:
-      context: ./src/dataset/initialImport/
+      context: ./src/Dataset/InitialImport/
       dockerfile: Dockerfile
     container_name: python-import
     environment:
@@ -28,6 +13,21 @@ services:
     depends_on:
       - data-system
     restart: no
+    links:
+      - db
+  data-system:
+    build:
+      context: ./src/DataSystem/
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    container_name: data-system
+    ports:
+      - "6500:8080"
+    restart: always
+    environment:
+      - SQL_SERVER=User ID=postgres;Password=postgres;Server=db;Port=5432;Database=data-system-db;Pooling=true;
     links:
       - db
   db:  
@@ -47,7 +47,7 @@ services:
       retries: 10
     volumes:
       - data:/var/lib/postgresql/data
-      - ./src/dataset/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./src/Dataset/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   data:
