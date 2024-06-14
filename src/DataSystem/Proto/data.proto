@@ -1,41 +1,58 @@
 syntax = "proto3";
 
 import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
 
-// set namespace for generated assets
 option csharp_namespace = "DataSystem.Grpc";
 
-// main service with callable functions
+// The DataService definition
 service DataService {
-  rpc Save (SaveRequest) returns (BasicReply);
+    // Save the data from the request to the database
+    rpc Save (SaveRequest) returns (BasicReply) {
+        option (google.api.http) = {
+            post: "/v1/data"
+        };
+    };
 }
 
+// The SaveRequest definition
 message SaveRequest {
-  // publicly faced endpoints needs authorization
-  string AuthorizationToken = 1;
+    // authorization token
+    string AuthorizationToken = 1;
 
-  string TimeStamp = 5;
-  string DeviceId = 6;
+    // timestamp of the telemetry data
+    string TimeStamp = 5;
+    // MAC address of the telemetry device
+    string DeviceId = 6;
   
-  // leave space for new fields between content fields and identifying fields
-  google.protobuf.DoubleValue CarbonDioxide = 20;
-  google.protobuf.DoubleValue Humidity = 21;
-  google.protobuf.BoolValue Light = 22;
-  google.protobuf.DoubleValue Lpg = 23;
-  google.protobuf.BoolValue Motion = 24;
-  google.protobuf.DoubleValue Smoke = 25;
-  google.protobuf.DoubleValue Temperature = 26;
-  // leave space
-  google.protobuf.StringValue AdditionalData = 50;
+    // carbon-dioxide level
+    google.protobuf.DoubleValue CarbonDioxide = 20;
+    // humnidity level
+    google.protobuf.DoubleValue Humidity = 21;
+    // if light is present at sensor reading
+    google.protobuf.BoolValue Light = 22;
+    // lpg level
+    google.protobuf.DoubleValue Lpg = 23;
+    // if motion is present at sensor reading
+    google.protobuf.BoolValue Motion = 24;
+    // smoke/particle level
+    google.protobuf.DoubleValue Smoke = 25;
+    // temperature at sensor reading
+    google.protobuf.DoubleValue Temperature = 26;
+    // additiona json encoded data to be stored
+    google.protobuf.StringValue AdditionalData = 50;
 }
 
 message BasicReply {
-  enum ResponseValue {
-    RESPONSE_OK = 0;
-    RESPONSE_UNAUTHORIZED = 1;
-    RESPONSE_INTERNAL_SERVER_ERROR = 2;
-  }
+    // response description
+    enum ResponseValue {
+        RESPONSE_OK = 0;
+        RESPONSE_UNAUTHORIZED = 1;
+        RESPONSE_INTERNAL_SERVER_ERROR = 2;
+    }
 
-  ResponseValue ResponseState = 1;
-  string ResponseMessage = 2;
+    // state of request
+    ResponseValue ResponseState = 1;
+    // additional info about potential failed request
+    string ResponseMessage = 2;
 }
