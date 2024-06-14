@@ -8,14 +8,11 @@ namespace DataSystem.Tests.Service;
 
 internal class TestServerCallContext : ServerCallContext
 {
-    private readonly Metadata _requestHeaders;
-    private readonly CancellationToken _cancellationToken;
-    private readonly Metadata _responseTrailers;
     private readonly AuthContext _authContext;
+    private readonly CancellationToken _cancellationToken;
+    private readonly Metadata _requestHeaders;
+    private readonly Metadata _responseTrailers;
     private readonly Dictionary<object, object> _userState;
-    private WriteOptions? _writeOptions;
-
-    public Metadata? ResponseHeaders { get; private set; }
 
     private TestServerCallContext(Metadata requestHeaders, CancellationToken cancellationToken)
     {
@@ -26,6 +23,8 @@ internal class TestServerCallContext : ServerCallContext
         _userState = new Dictionary<object, object>();
     }
 
+    public Metadata? ResponseHeaders { get; private set; }
+
     protected override string MethodCore => "MethodName";
     protected override string HostCore => "HostName";
     protected override string PeerCore => "PeerName";
@@ -35,13 +34,11 @@ internal class TestServerCallContext : ServerCallContext
     protected override Metadata ResponseTrailersCore => _responseTrailers;
     protected override Status StatusCore { get; set; }
 
-    protected override WriteOptions? WriteOptionsCore
-    {
-        get => _writeOptions;
-        set { _writeOptions = value; }
-    }
+    protected override WriteOptions? WriteOptionsCore { get; set; }
 
     protected override AuthContext AuthContextCore => _authContext;
+
+    protected override IDictionary<object, object> UserStateCore => _userState;
 
     protected override ContextPropagationToken CreatePropagationTokenCore(ContextPropagationOptions options)
     {
@@ -50,16 +47,11 @@ internal class TestServerCallContext : ServerCallContext
 
     protected override Task WriteResponseHeadersAsyncCore(Metadata responseHeaders)
     {
-        if (ResponseHeaders != null)
-        {
-            throw new InvalidOperationException("Response headers have already been written.");
-        }
+        if (ResponseHeaders != null) throw new InvalidOperationException("Response headers have already been written.");
 
         ResponseHeaders = responseHeaders;
         return Task.CompletedTask;
     }
-
-    protected override IDictionary<object, object> UserStateCore => _userState;
 
     public static TestServerCallContext Create(Metadata? requestHeaders = null,
         CancellationToken cancellationToken = default)
