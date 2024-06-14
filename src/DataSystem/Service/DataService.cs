@@ -28,15 +28,8 @@ public class DataService : Grpc.DataService.DataServiceBase
     /// <returns>return BasicReply which consists of a ResponseState and a message when the call fails</returns>
     public override async Task<BasicReply> Save(SaveRequest request, ServerCallContext serverContext)
     {
-        // check for token
-        if (string.IsNullOrEmpty(request.AuthorizationToken) ||
-            !Guid.TryParse(request.AuthorizationToken.AsSpan(), out var guid))
-            return await Task.FromResult(CreateResult(BasicReply.Types.ResponseValue.ResponseUnauthorized));
-
         // check if token exist and allows for writing data
-        var authorizationEntry =
-            await context.Authorization.FirstOrDefaultAsync(i =>
-                i.Token == guid && i.Locked == false && i.AuthorizedFlags.HasFlag(AuthorizeFlags.Write));
+        var authorizationEntry = await Authorization.CheckForAuthorizationFlags(context, request.AuthorizationToken, AuthorizeFlags.Write, false);
 
         if (authorizationEntry == null)
             return await Task.FromResult(CreateResult(BasicReply.Types.ResponseValue.ResponseUnauthorized));

@@ -29,7 +29,7 @@ public class DataController : ControllerBase
     /// </summary>
     /// <param name="accessToken">the authorization token</param>
     /// <param name="deviceId">the deviceId of the selected device</param>
-    /// <param name="count">maximum number of returned rows</param>
+    /// <param name="count">maximum number of returned rows (max. 500). reset to 100 when out of range {0...500}</param>
     /// <returns>
     ///     dataset containing the matching rows when deviceId is specified, otherwise dataset containing rows ordered by
     ///     descending timestamp. it contains a maximum number of rows specified by the count parameter
@@ -41,13 +41,12 @@ public class DataController : ControllerBase
     public async Task<ActionResult<List<SensorDataDto>>> GetLatestData(string accessToken, string? deviceId = null,
         int count = 100)
     {
-        // check if token is set and valid
-        if (string.IsNullOrEmpty(accessToken) || !Guid.TryParse(accessToken.AsSpan(), out var guid))
-            return BadRequest();
-
-        var authorizationEntry = await context.Authorization
-            .Where(i => i.Token == guid && i.Locked == false && i.AuthorizedFlags.HasFlag(AuthorizeFlags.Read))
-            .FirstOrDefaultAsync();
+        // reset to 100 entries when out of range
+        if (!Enumerable.Range(1, 500).Contains(count))
+            count = 100;
+        
+        // check for existing Authorization
+        var authorizationEntry = await Authorization.CheckForAuthorizationFlags(context, accessToken, AuthorizeFlags.Read, false);
 
         // return if token is not allowed or locked
         if (authorizationEntry == null)
