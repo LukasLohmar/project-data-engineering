@@ -6,27 +6,29 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>DataSystem</RootNamespace>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeHttpRuleProtos>true</IncludeHttpRuleProtos>
+        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.27.1" />
+        <PackageReference Include="Google.Protobuf" Version="3.27.1"/>
         <PackageReference Include="Grpc.Tools" Version="2.64.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.Grpc.Swagger" Version="0.8.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Grpc.Swagger" Version="0.8.6"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore" Version="2.63.0" />
-        <Protobuf Include="Proto\data.proto" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.63.0"/>
+        <Protobuf Include="Proto\data.proto"/>
     </ItemGroup>
 
 </Project>
