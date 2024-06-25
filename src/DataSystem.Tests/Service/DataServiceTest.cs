@@ -115,13 +115,13 @@ public class DataServiceTest
     }
 
     [TestMethod]
-    [DataRow("11111111-1111-1111-1111-111111111112", 4, 1, 1, null, 0, 25, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTimestamp, null)]
-    [DataRow("11111111-1111-1111-1111-111111111112", 4, 4, 1, null, 0, 25, RequestOrderBy.OrderByDescending, RequestOrderValue.OrderValueByTimestamp, null)]
-    [DataRow("11111111-1111-1111-1111-111111111112", 2, 3, 2, null, 1, 2, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTimestamp, null)]
-    [DataRow("11111111-1111-1111-1111-111111111112", 4, 3, 1, null, 0, 5, RequestOrderBy.OrderByDescending, RequestOrderValue.OrderValueByTemperature, null)]
-    [DataRow("11111111-1111-1111-1111-111111111112", 2, 4, 1, "A9612CF6BB21", 0, 5, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTemperature, null)]
-    [DataRow("11111111-1111-1111-1111-111111111112", 1, 2, 1, "A9612CF6BB21", 0, 5, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTimestamp, "now")]
-    [DataRow("11111111-1111-1111-1111-111111111112", 1, 4, 1, "A9612CF6BB21", 0, 5, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTimestamp, "addTwoDays")]
+    [DataRow("11111111-1111-1111-1111-111111111112", 4, 1, 1, null, 1, 25, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTimestamp, null)]
+    [DataRow("11111111-1111-1111-1111-111111111112", 4, 4, 1, null, 1, 25, RequestOrderBy.OrderByDescending, RequestOrderValue.OrderValueByTimestamp, null)]
+    [DataRow("11111111-1111-1111-1111-111111111112", 2, 3, 2, null, 2, 2, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTimestamp, null)]
+    [DataRow("11111111-1111-1111-1111-111111111112", 4, 3, 1, null, 1, 5, RequestOrderBy.OrderByDescending, RequestOrderValue.OrderValueByTemperature, null)]
+    [DataRow("11111111-1111-1111-1111-111111111112", 2, 4, 1, "A9612CF6BB21", 1, 5, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTemperature, null)]
+    [DataRow("11111111-1111-1111-1111-111111111112", 1, 2, 1, "A9612CF6BB21", 1, 5, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTimestamp, "now")]
+    [DataRow("11111111-1111-1111-1111-111111111112", 1, 4, 1, "A9612CF6BB21", 1, 5, RequestOrderBy.OrderByAscending, RequestOrderValue.OrderValueByTimestamp, "addTwoDays")]
     public async Task GetDataTest(string token, int expectedCount, int expectedId, int totalPages, string deviceId, int pageIndex, int pageSize, RequestOrderBy order, RequestOrderValue orderValue, string entryDate)
     {
         var authorization = new Authorization
