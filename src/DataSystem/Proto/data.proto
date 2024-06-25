@@ -7,16 +7,16 @@ import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "DataSystem.Grpc";
 
-// The DataService definition
+// the DataService definition
 service DataService {
-    // Save the data from the request to the database
+    // save the data from the request to the database
     rpc Save (SaveRequest) returns (BasicPostReply) {
         option (google.api.http) = {
             post: "/v1/data"
         };
     };
 
-    // Get the data from the database
+    // get the data from the database
     rpc GetData (GetDataRequest) returns (BasicPagedReply) {
         option (google.api.http) = {
             get: "/v1/data"
@@ -24,7 +24,7 @@ service DataService {
     };
 }
 
-// The SaveRequest definition
+// the SaveRequest definition
 message SaveRequest {
     // authorization token
     string AuthorizationToken = 1;
@@ -52,40 +52,26 @@ message SaveRequest {
     google.protobuf.StringValue AdditionalData = 50;
 }
 
-// order value
 enum RequestOrderValue {
-    // unknown value was sent
     ORDER_VALUE_DEFAULT = 0;
-    // ordered by timestamp
     ORDER_VALUE_BY_TIMESTAMP = 20;
-    // ordered by humidity
     ORDER_VALUE_BY_HUMIDITY = 21;
-    // ordered by carbon dioxide
     ORDER_VALUE_BY_CARBON_DIOXIDE = 22;
-    // ordered by lpg
     ORDER_VALUE_BY_LPG = 23;
-    // ordered by temperature
     ORDER_VALUE_BY_TEMPERATURE = 24;
-    // ordered by smoke
     ORDER_VALUE_BY_SMOKE = 25;
-    // ordered by light
     ORDER_VALUE_BY_LIGHT = 26;
-    // ordered by motion
     ORDER_VALUE_BY_MOTION = 27;
 }
 
-// order value
 enum RequestOrderBy {
-    // unknown value was sent
     ORDER_BY_DEFAULT = 0;
-    // order ascending
     ORDER_BY_ASCENDING = 1;
-    // order descending
     ORDER_BY_DESCENDING = 2;
 }
 
 enum RequestResponseType {
-    RESPONSE_NONE = 0;
+    RESPONSE_DEFAULT = 0;
     RESPONSE_OK = 200;
     RESPONSE_NO_CONTENT = 204;
     RESPONSE_PARTIAL_CONTENT = 206;
@@ -103,9 +89,9 @@ message GetDataRequest {
     string AuthorizationToken = 1;
 
     // Ordering of current results
-    optional RequestOrderBy Order = 5;
+    RequestOrderBy Order = 5;
     // The value ordering is based on
-    optional RequestOrderValue OrderValue = 6;
+    RequestOrderValue OrderValue = 6;
     
     // MAC address of the telemetry device
     google.protobuf.StringValue DeviceId = 10;
@@ -151,7 +137,7 @@ message BasicPagedReply {
     // if a next page is available
     google.protobuf.BoolValue HasNextPage = 13;
     // result items
-    repeated SensorDataDto Items = 50;
+    repeated SensorDataDto Items = 500;
 }
 
 // sensor data dto - needs additional implementation

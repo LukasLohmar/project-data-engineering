@@ -26,7 +26,7 @@ public class DataService : Grpc.DataService.DataServiceBase
     private static readonly Dictionary<RequestOrderValue, IOrderBy> OrderHelperExpressions =
         new()
         {
-            { RequestOrderValue.OrderValueDefault, new OrderByHelper<SensorData, DateTime>(m => m.TimeStamp) },
+            { RequestOrderValue.OrderValueDefault, new OrderByHelper<SensorData, int>(m => m.Id) },
             { RequestOrderValue.OrderValueByTimestamp, new OrderByHelper<SensorData, DateTime>(m => m.TimeStamp) },
             { RequestOrderValue.OrderValueByHumidity, new OrderByHelper<SensorData, decimal?>(m => m.Humidity) },
             { RequestOrderValue.OrderValueByCarbonDioxide, new OrderByHelper<SensorData, decimal?>(m => m.CarbonDioxide) },
@@ -163,7 +163,7 @@ public class DataService : Grpc.DataService.DataServiceBase
                 RequestResponseType.ResponseOk => "values saved to system",
                 RequestResponseType.ResponseUnauthorized => "unauthorized request",
                 RequestResponseType.ResponseInternalError => $"error: {errorMessage}",
-                RequestResponseType.ResponseNone => "",
+                RequestResponseType.ResponseDefault => "",
                 _ => ""
             }
         };
