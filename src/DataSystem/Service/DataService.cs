@@ -2,6 +2,7 @@ using System.Net.NetworkInformation;
 using DataSystem.Database;
 using DataSystem.Extensions;
 using DataSystem.Grpc;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,14 @@ namespace DataSystem.Service;
 public class DataService : Grpc.DataService.DataServiceBase
 {
     // default values for requests
-    private static readonly int DEFAULT_PAGE_INDEX = 0;
-    private static readonly int DEFAULT_PAGE_SIZE = 100;
-    private static readonly int MIN_PAGE_SIZE = 1;
-    private static readonly int MAX_PAGE_SIZE = 500;
+    // ReSharper disable once InconsistentNaming
+    private const int DEFAULT_PAGE_INDEX = 0;
+    // ReSharper disable once InconsistentNaming
+    private const int DEFAULT_PAGE_SIZE = 100;
+    // ReSharper disable once InconsistentNaming
+    private const int MIN_PAGE_SIZE = 1;
+    // ReSharper disable once InconsistentNaming
+    private const int MAX_PAGE_SIZE = 500;
 
     private static readonly Dictionary<RequestOrderValue, IOrderBy> OrderHelperExpressions =
         new()
@@ -51,6 +56,10 @@ public class DataService : Grpc.DataService.DataServiceBase
         if (authorizationEntry == null)
             return await Task.FromResult(CreatePostResult(RequestResponseType.ResponseUnauthorized));
 
+        if (request.TimeStamp is null)
+            return await Task.FromResult(CreatePostResult(RequestResponseType.ResponseInternalError,
+                "no timestamp was provided"));
+        
         // check for device id -> do not save if mac is not provided
         if (string.IsNullOrEmpty(request.DeviceId) || !PhysicalAddress.TryParse(request.DeviceId, out var deviceId))
             return await Task.FromResult(CreatePostResult(RequestResponseType.ResponseInternalError,
@@ -105,7 +114,7 @@ public class DataService : Grpc.DataService.DataServiceBase
             ? query.OrderByDescending(OrderHelperExpressions[request.OrderValue])
             : query.OrderBy(OrderHelperExpressions[request.OrderValue]);
 
-        var entryDate = request.EntryDate.DateCase switch
+        var entryDate = request.EntryDate is null ? DateTime.UnixEpoch : request.EntryDate.DateCase switch
         {
             NullableTimeStamp.DateOneofCase.None => DateTime.UnixEpoch,
             NullableTimeStamp.DateOneofCase.Null => DateTime.UnixEpoch,
@@ -120,7 +129,20 @@ public class DataService : Grpc.DataService.DataServiceBase
         var count = await query.CountAsync();
 
         // get actual paginated data
-        var results = query.Skip(pageIndex * pageSize).Take(pageSize).Select(i => new SensorDataDto());
+        var results = query.Skip(pageIndex * pageSize).Take(pageSize).Select(i => new SensorDataDto
+        {
+            Id = i.Id,
+            TimeStamp = Timestamp.FromDateTime(i.TimeStamp.ToUniversalTime()),
+            DeviceId = i.DeviceId.ToString(),
+            CarbonDioxide = i.CarbonDioxide.HasValue ? (double)i.CarbonDioxide.Value : null,
+            Humidity = i.Humidity.HasValue ? (double)i.Humidity.Value : null,
+            Light = i.Light,
+            Lpg = i.Lpg.HasValue ? (double)i.Lpg.Value : null,
+            Motion = i.Motion,
+            Smoke = i.Smoke.HasValue ? (double)i.Smoke.Value : null,
+            Temperature = i.Temperature.HasValue ? (double)i.Temperature.Value : null,
+            AdditionalData = i.AdditionalData
+        });
 
         // check if results is not empty
         if (results.Any())
