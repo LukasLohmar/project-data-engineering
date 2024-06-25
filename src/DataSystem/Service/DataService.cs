@@ -15,7 +15,7 @@ public class DataService : Grpc.DataService.DataServiceBase
 {
     // default values for requests
     // ReSharper disable once InconsistentNaming
-    private const int DEFAULT_PAGE_INDEX = 0;
+    private const int DEFAULT_PAGE_INDEX = 1;
     // ReSharper disable once InconsistentNaming
     private const int DEFAULT_PAGE_SIZE = 100;
     // ReSharper disable once InconsistentNaming
@@ -92,6 +92,9 @@ public class DataService : Grpc.DataService.DataServiceBase
         var pageSize = request.PageSize.GetValueOrDefault(DEFAULT_PAGE_SIZE);
         var pageIndex = request.PageIndex.GetValueOrDefault(DEFAULT_PAGE_INDEX);
 
+        if (pageIndex < DEFAULT_PAGE_INDEX)
+            pageIndex = DEFAULT_PAGE_INDEX;
+        
         // reset to 100 entries when out of range
         if (!Enumerable.Range(MIN_PAGE_SIZE, MAX_PAGE_SIZE).Contains(pageSize))
             pageSize = DEFAULT_PAGE_SIZE;
@@ -103,7 +106,7 @@ public class DataService : Grpc.DataService.DataServiceBase
 
         // return if token is not allowed or locked
         if (authorizationEntry == null)
-            return CreatePagedReply(RequestResponseType.ResponseUnauthorized, null, 0, 0);
+            return CreatePagedReply(RequestResponseType.ResponseUnauthorized, new List<SensorDataDto>(), 0, 0);
 
         // get generic queryable when deviceId is not set
         var query = request.DeviceId != null && PhysicalAddress.TryParse(request.DeviceId, out var parsedDeviceId)
@@ -123,13 +126,19 @@ public class DataService : Grpc.DataService.DataServiceBase
         };
         
         if (!entryDate.Equals(DateTime.UnixEpoch))
-            query = query.Where(i => i.TimeStamp.ToShortDateString() == entryDate.ToShortDateString());
+        {
+            // to short date work around - remove timezone from datetime object
+            var startDate = DateTimeOffset.Parse(entryDate.Date.ToShortDateString(), null);
+            var endDate = startDate.AddDays(1);
+            
+            query = query.Where(i => i.TimeStamp > startDate && i.TimeStamp < endDate);
+        }
         
         // get full entry count
         var count = await query.CountAsync();
 
         // get actual paginated data
-        var results = query.Skip(pageIndex * pageSize).Take(pageSize).Select(i => new SensorDataDto
+        var results = query.Skip((pageIndex - 1) * pageSize).Take(pageSize).Select(i => new SensorDataDto
         {
             Id = i.Id,
             TimeStamp = Timestamp.FromDateTime(i.TimeStamp.ToUniversalTime()),
@@ -149,7 +158,7 @@ public class DataService : Grpc.DataService.DataServiceBase
             return CreatePagedReply(RequestResponseType.ResponseOk, await results.ToListAsync(), pageIndex,
                 (int)Math.Ceiling(count / (double)pageSize));
 
-        return CreatePagedReply(RequestResponseType.ResponseNoContent, null, pageIndex,
+        return CreatePagedReply(RequestResponseType.ResponseNoContent, new List<SensorDataDto>(), pageIndex,
             (int)Math.Ceiling(count / (double)pageSize));
     }
 
