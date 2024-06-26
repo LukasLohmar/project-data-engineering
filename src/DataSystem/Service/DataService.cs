@@ -73,7 +73,8 @@ public class DataService : Grpc.DataService.DataServiceBase
 
         var newEntry = new SensorData
         {
-            TimeStamp = request.TimeStamp.ToDateTime(),
+            // remove timezone
+            TimeStamp = DateTimeOffset.Parse(request.TimeStamp.ToDateTime().ToLongDateString(), null).DateTime,
             DeviceId = deviceId,
             CarbonDioxide = request.CarbonDioxide.HasValue ? (decimal)request.CarbonDioxide.Value : null,
             Humidity = request.Humidity.HasValue ? (decimal)request.Humidity.Value : null,
