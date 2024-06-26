@@ -16,10 +16,13 @@ public class DataService : Grpc.DataService.DataServiceBase
     // default values for requests
     // ReSharper disable once InconsistentNaming
     private const int DEFAULT_PAGE_INDEX = 1;
+
     // ReSharper disable once InconsistentNaming
     private const int DEFAULT_PAGE_SIZE = 100;
+
     // ReSharper disable once InconsistentNaming
     private const int MIN_PAGE_SIZE = 1;
+
     // ReSharper disable once InconsistentNaming
     private const int MAX_PAGE_SIZE = 500;
 
@@ -29,7 +32,10 @@ public class DataService : Grpc.DataService.DataServiceBase
             { RequestOrderValue.OrderValueDefault, new OrderByHelper<SensorData, int>(m => m.Id) },
             { RequestOrderValue.OrderValueByTimestamp, new OrderByHelper<SensorData, DateTime>(m => m.TimeStamp) },
             { RequestOrderValue.OrderValueByHumidity, new OrderByHelper<SensorData, decimal?>(m => m.Humidity) },
-            { RequestOrderValue.OrderValueByCarbonDioxide, new OrderByHelper<SensorData, decimal?>(m => m.CarbonDioxide) },
+            {
+                RequestOrderValue.OrderValueByCarbonDioxide,
+                new OrderByHelper<SensorData, decimal?>(m => m.CarbonDioxide)
+            },
             { RequestOrderValue.OrderValueByLpg, new OrderByHelper<SensorData, decimal?>(m => m.Lpg) },
             { RequestOrderValue.OrderValueByTemperature, new OrderByHelper<SensorData, decimal?>(m => m.Temperature) },
             { RequestOrderValue.OrderValueBySmoke, new OrderByHelper<SensorData, decimal?>(m => m.Smoke) },
@@ -59,7 +65,7 @@ public class DataService : Grpc.DataService.DataServiceBase
         if (request.TimeStamp is null)
             return await Task.FromResult(CreatePostResult(RequestResponseType.ResponseInternalError,
                 "no timestamp was provided"));
-        
+
         // check for device id -> do not save if mac is not provided
         if (string.IsNullOrEmpty(request.DeviceId) || !PhysicalAddress.TryParse(request.DeviceId, out var deviceId))
             return await Task.FromResult(CreatePostResult(RequestResponseType.ResponseInternalError,
@@ -94,7 +100,7 @@ public class DataService : Grpc.DataService.DataServiceBase
 
         if (pageIndex < DEFAULT_PAGE_INDEX)
             pageIndex = DEFAULT_PAGE_INDEX;
-        
+
         // reset to 100 entries when out of range
         if (!Enumerable.Range(MIN_PAGE_SIZE, MAX_PAGE_SIZE).Contains(pageSize))
             pageSize = DEFAULT_PAGE_SIZE;
@@ -117,23 +123,25 @@ public class DataService : Grpc.DataService.DataServiceBase
             ? query.OrderByDescending(OrderHelperExpressions[request.OrderValue])
             : query.OrderBy(OrderHelperExpressions[request.OrderValue]);
 
-        var entryDate = request.EntryDate is null ? DateTime.UnixEpoch : request.EntryDate.DateCase switch
-        {
-            NullableTimeStamp.DateOneofCase.None => DateTime.UnixEpoch,
-            NullableTimeStamp.DateOneofCase.Null => DateTime.UnixEpoch,
-            NullableTimeStamp.DateOneofCase.Value => request.EntryDate.Value.ToDateTime(),
-            _ => DateTime.UnixEpoch
-        };
-        
+        var entryDate = request.EntryDate is null
+            ? DateTime.UnixEpoch
+            : request.EntryDate.DateCase switch
+            {
+                NullableTimeStamp.DateOneofCase.None => DateTime.UnixEpoch,
+                NullableTimeStamp.DateOneofCase.Null => DateTime.UnixEpoch,
+                NullableTimeStamp.DateOneofCase.Value => request.EntryDate.Value.ToDateTime(),
+                _ => DateTime.UnixEpoch
+            };
+
         if (!entryDate.Equals(DateTime.UnixEpoch))
         {
             // to short date work around - remove timezone from datetime object
             var startDate = DateTimeOffset.Parse(entryDate.Date.ToShortDateString(), null);
             var endDate = startDate.AddDays(1);
-            
+
             query = query.Where(i => i.TimeStamp > startDate && i.TimeStamp < endDate);
         }
-        
+
         // get full entry count
         var count = await query.CountAsync();
 
