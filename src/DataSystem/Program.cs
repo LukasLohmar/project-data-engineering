@@ -1,12 +1,21 @@
-﻿using System.Reflection;
+﻿using System.Net;
+using System.Reflection;
 using DataSystem.Database;
 using DataSystem.Service;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(serverOptions => {
+    serverOptions.Listen(IPAddress.Any, 8080, options => {
+        options.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1;
+    });
+
+    serverOptions.Listen(IPAddress.Any, 8081, options => {
+        options.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
+    });
+});
 
 // database service to application
 builder.Services.AddDbContextFactory<ApplicationContext>(options =>
@@ -21,6 +30,7 @@ builder.Services.AddGrpc().AddJsonTranscoding();
 builder.Services.AddGrpcReflection();
 
 // add services for swagger documentation generation
+
 builder.Services.AddMvc();
 builder.Services.AddGrpcSwagger();
 builder.Services.AddSwaggerGen(c =>

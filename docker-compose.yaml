@@ -24,14 +24,13 @@ services:
         condition: service_healthy
     container_name: data-system
     ports:
-      - "6500:80"
-      - "6501:443"
+      - "6500:8080"
+      - "6501:8081"
     restart: always
     environment:
       - SQL_SERVER=User ID=postgres;Password=postgres;Server=db;Port=5432;Database=data-system-db;Pooling=true;
       - ENABLE_REFLECTION=true
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+;http://+
       - ASPNETCORE_Kestrel__Certificates__Default__Password=testCertificatePassword
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/data-system/https/aspnetapp.pfx
     links:
